@@ -14,10 +14,9 @@ pipeline {
       steps {
         script {
           initBuild()
-          sh 'yarn install'
+          sh 'npm install'
           securityScan()
-          sh 'yarn lint'
-          sh 'yarn build'
+          sh 'npm test'
 
           if (env.BRANCH_NAME == '7.13') {
             publishNewNpmVersionIfAny("./package.json", ".")
