@@ -76,8 +76,9 @@ interface DeleteAction {
   }
 }
 
+type IndexActionOverride = [IndexAction | CreateAction, Record<string, any>]
 type UpdateAction = [UpdateActionOperation, Record<string, any>]
-type Action = IndexAction | CreateAction | UpdateAction | DeleteAction
+type Action = IndexAction | CreateAction | UpdateAction | DeleteAction | IndexActionOverride
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
 export interface BulkHelperOptions<TDocument = unknown> extends Omit<Bulk, 'body'> {

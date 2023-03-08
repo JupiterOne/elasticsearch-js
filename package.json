@@ -1,5 +1,5 @@
 {
-  "name": "@elastic/elasticsearch",
+  "name": "@jupiterone/elasticsearch",
   "description": "The official Elasticsearch client for Node.js",
   "main": "index.js",
   "types": "index.d.ts",
@@ -11,8 +11,7 @@
     "./": "./"
   },
   "homepage": "http://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/index.html",
-  "version": "7.13.0",
-  "versionCanary": "7.13.0-canary.5",
+  "version": "7.13.1",
   "keywords": [
     "elasticsearch",
     "elastic",

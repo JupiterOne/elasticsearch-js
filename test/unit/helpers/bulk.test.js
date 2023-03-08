@@ -38,6 +38,15 @@ const dataset = [
   { user: 'tyrion', age: 39 }
 ]
 
+const wrappedData = [{
+  type: 'PROFILE_CREATED',
+  detail: {
+    profile: {
+      user: 'jon', age: 23
+    }
+  }
+}]
+
 test('bulk index', t => {
   t.test('datasource as array', t => {
     t.test('Should perform a bulk request', async t => {
@@ -300,6 +309,55 @@ test('bulk index', t => {
       t.match(result, {
         total: 3,
         successful: 3,
+        retry: 0,
+        failed: 0,
+        aborted: false
+      })
+    })
+
+    t.test('Should perform a bulk request (document override)', async t => {
+      const MockConnection = connection.buildMockConnection({
+        onRequest (params) {
+          t.equal(params.path, '/_bulk')
+          t.match(params.headers, { 'content-type': 'application/x-ndjson' })
+          // @ts-expect-error
+          const [action, payload] = params.body.split('\n')
+          const profile = wrappedData[0].detail.profile
+          t.same(JSON.parse(action), [{ index: { _index: 'test', _id: profile.user } }, profile])
+          t.same(JSON.parse(payload), dataset[0])
+          return { body: { errors: false, items: [{}] } }
+        }
+      })
+
+      const client = new Client({
+        node: 'http://localhost:9200',
+        Connection: MockConnection
+      })
+      const result = await client.helpers.bulk({
+        datasource: wrappedData,
+        flushBytes: 1,
+        concurrency: 1,
+        onDocument (doc) {
+          return [
+            {
+              index: {
+                _index: 'test',
+                _id: String(doc.detail.profile.user)
+              }
+            },
+            doc.detail.profile
+          ]
+        },
+        onDrop (doc) {
+          t.fail('This should never be called')
+        }
+      })
+
+      t.type(result.time, 'number')
+      t.type(result.bytes, 'number')
+      t.match(result, {
+        total: 1,
+        successful: 1,
         retry: 0,
         failed: 0,
         aborted: false
