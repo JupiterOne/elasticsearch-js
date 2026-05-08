@@ -27,9 +27,7 @@ import stoppable, { StoppableServer } from 'stoppable'
 
 const debug = Debug('elasticsearch-test')
 
-// allow self signed certificates for testing purposes
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-
+// Keep TLS certificate validation enabled; tests should trust the fixture cert explicitly.
 const secureOpts = {
   key: readFileSync(join(__dirname, '..', 'fixtures', 'https.key'), 'utf8'),
   cert: readFileSync(join(__dirname, '..', 'fixtures', 'https.cert'), 'utf8')
